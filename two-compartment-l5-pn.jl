@@ -9,9 +9,10 @@ uA = 1e-6
 mS = 1e-3
 
 # A few constants...
-Cm = 100*uF # Membrane Conductance 
+Cm = 2*uF # Membrane Conductance 
 p = 0.5   # Somatic area/Total area 
-dt = 0.5*ms 
+T = 5
+dt = 1*ms 
 
 beta_m = -1.2*mV 
 gamma_m = 18*mV
@@ -71,21 +72,28 @@ Vrests = -60*mV
 Vrestd = -70*mV 
 Vth    = -47*mV
 
-function simulate(T=5, dt=1*ms)
+function simulate()
   voltage_trace_s = zeros(Int(T/dt))
   voltage_trace_d = zeros(Int(T/dt))
 
   voltage_trace_s[1] = -64.8*mV
   voltage_trace_d[1] = -64.8594*mV
 
-  steady_input_current_s = 34*uA
+  steady_input_current_s = 0*uA
   steady_input_current_d = 0*uA
 
   input_current_s = zeros(Int(T/dt))
   input_current_d = zeros(Int(T/dt))
+
   for i in 1:Int(T/dt)
     if i >= 100 && i < 200
       input_current_s[i] = steady_input_current_s
+    end
+  end 
+
+  for i in 1:Int(T/dt)
+    if i >= 100 && i < 200
+      input_current_d[i] = steady_input_current_d
     end
   end 
 
@@ -123,9 +131,11 @@ end
 
 voltage_d, voltage_s = simulate()
 gr()
-x = range(1, stop=Int(5/(1*ms)))
+x = range(1, stop=Int(T/dt))
 y = voltage_s
 z = voltage_d
-plt = plot(x, y)
-# plt2 = plot!(plt, x, z)
-gui(plt)
+plt = plot(x, y, label="Somatic Voltage")
+plt2 = plot(x, z, label="Dendritic Voltage")
+
+plot(plt, plt2, layout=(2,1))
+
